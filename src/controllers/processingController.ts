@@ -46,7 +46,8 @@ router.post(
       } else if (req.body.inputUrl) {
         // URL was provided
         inputUrl = req.body.inputUrl;
-        const extension = inputUrl.split('.').pop() || 'mp4'; // Add fallback extension
+        // Add a type assertion to tell TypeScript that inputUrl is definitely a string here
+        const extension = (inputUrl as string).split('.').pop() || 'mp4'; // Add fallback extension
         const inputFileName = `input-${uuidv4()}.${extension}`;
         inputPath = path.join(config.paths.uploads, inputFileName);
         logger.info(`Processing from URL: ${inputUrl}`);
