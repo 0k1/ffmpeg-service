@@ -46,7 +46,8 @@ router.post(
       } else if (req.body.inputUrl) {
         // URL was provided
         inputUrl = req.body.inputUrl;
-        const inputFileName = `input-${uuidv4()}.${inputUrl.split('.').pop()}`;
+        const extension = inputUrl.split('.').pop() || 'mp4'; // Add fallback extension
+        const inputFileName = `input-${uuidv4()}.${extension}`;
         inputPath = path.join(config.paths.uploads, inputFileName);
         logger.info(`Processing from URL: ${inputUrl}`);
       } else {
