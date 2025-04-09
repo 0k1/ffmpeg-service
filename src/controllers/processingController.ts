@@ -6,7 +6,7 @@ import { uploadMiddleware } from '../middleware/upload';
 import { authMiddleware } from '../middleware/auth';
 import { validateCommand, validateJobId } from '../utils/validators';
 import { processFFmpegCommand } from '../services/ffmpegService';
-import { uploadToS3, generateSignedUrl } from '../services/storageService';
+import { storeFile, generateFileUrl } from '../services/storageService';
 import { logger } from '../utils/logger';
 import { updateJobStatus } from '../services/jobService';
 import config from '../config';
@@ -75,18 +75,17 @@ router.post(
           outputPath,
         });
         
-        // Upload to S3
-        const s3Key = `outputs/${outputFileName}`;
-        await uploadToS3(outputPath, s3Key, outputFormat);
+        // Store the file locally instead of S3
+        const { key } = await storeFile(outputPath, outputFormat);
         
-        // Generate signed URL
-        const signedUrl = await generateSignedUrl(s3Key);
+        // Generate URL
+        const fileUrl = generateFileUrl(key);
         
         // Update job status to completed
-        await updateJobStatus(jobId, 'completed', signedUrl);
+        await updateJobStatus(jobId, 'completed', fileUrl);
         
         // Return success response
-        res.json({ success: true, outputUrl: signedUrl });
+        res.json({ success: true, outputUrl: fileUrl });
       } catch (error) {
         // Log error
         logger.error('FFmpeg processing error', error);
@@ -100,7 +99,7 @@ router.post(
           error: error instanceof Error ? error.message : 'Unknown processing error'
         });
       } finally {
-        // Clean up files
+        // Clean up temporary files
         cleanupFiles(inputPath, outputPath);
       }
     } catch (error) {

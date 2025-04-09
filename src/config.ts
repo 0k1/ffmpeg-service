@@ -10,14 +10,6 @@ const config = {
   apiSecretKey: process.env.API_SECRET_KEY || 'default_secret_key_change_this',
   logLevel: process.env.LOG_LEVEL || 'info',
   
-  // AWS S3 Configuration
-  aws: {
-    region: process.env.AWS_REGION || 'us-east-1',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
-    bucketName: process.env.S3_BUCKET_NAME || '',
-  },
-  
   // CloudFFmpeg API
   cloudffmpeg: {
     apiUrl: process.env.CLOUDFFMPEG_API_URL || 'http://localhost:3000',
@@ -30,13 +22,20 @@ const config = {
   paths: {
     uploads: path.resolve(process.cwd(), 'uploads'),
     output: path.resolve(process.cwd(), 'output'),
+    storage: path.resolve(process.cwd(), 'storage'),
   },
   
   // FFmpeg settings
   ffmpeg: {
     maxProcessingTime: 30 * 60 * 1000, // 30 minutes
     timeoutThreshold: 2 * 60 * 1000, // 2 minutes
-  }
+  },
+  
+  // Storage configuration
+  storage: {
+    retentionHours: 3, // Keep files for 3 hours
+    cleanupInterval: 60 * 60 * 1000, // Run cleanup every hour
+  },
 };
 
 export default config;
